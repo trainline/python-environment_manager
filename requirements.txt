@@ -1,0 +1,3 @@
+multiprocessing==2.6.2.1
+requests==2.12.1
+simplejson==3.10.0
