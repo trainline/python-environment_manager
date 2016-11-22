@@ -1,6 +1,8 @@
 """ Copyright (c) Trainline Limited, 2016. All rights reserved. See LICENSE.txt in the project root for license information. """
 # vim: tabstop=4 expandtab shiftwidth=4 softtabstop=4
 
+import os
+import re
 import traceback
 import logging
 import simplejson
@@ -114,3 +116,110 @@ def json_decode(string):
         log.error('Can\'t decode JSON string: %s' % string)
         return None
     return decoded_json
+
+def generate_sensu_check(check_name=None,
+                         command=None,
+                         handlers=['default'],
+                         interval=120,
+                         ocurrences=5,
+                         refresh=300,
+                         subscribers=['sensu-base'],
+                         standalone=True,
+                         timeout=120,
+                         aggregate=False,
+                         alert_after=600,
+                         realert_every=30,
+                         runbook='Needs information',
+                         sla='No SLA defined',
+                         team=None,
+                         notification_email=None,
+                         ticket=False,
+                         project=False,
+                         slack=False,
+                         page=False,
+                         tip='Fill me up with information',
+                         tags=[],
+                         **kwargs):
+    """ Generates a valid json for a sensu check """
+    # Checks validity of input
+    if check_name is None:
+        raise SyntaxError('Cannot create sensu check without a name')
+    if command is None:
+        raise SyntaxError('Need a valid command to create sensu check')
+    if team is None:
+        raise SyntaxError('Need to specify a valid team to assign events from this sensu check')
+    content = {'checks':{check_name:{'command': command,
+                                     'handlers': handlers,
+                                     'interval': interval,
+                                     'ocurrences': ocurrences,
+                                     'refresh': refresh,
+                                     'subscribers': subscribers,
+                                     'standalone': standalone,
+                                     'timeout': timeout,
+                                     'aggregate': aggregate,
+                                     'alert_after': alert_after,
+                                     'realert_every': realert_every,
+                                     'runbook': runbook,
+                                     'sla': sla,
+                                     'team': team,
+                                     'notification_email': notification_email,
+                                     'ticket': ticket,
+                                     'project': project,
+                                     'slack': slack,
+                                     'page': page,
+                                     'tip': tip,
+                                     'tags': tags}}}
+    for key, value in kwargs.iteritems():
+        content.update({key: value})
+    return json_encode(content)
+
+def compare_file_write(filename=None, content=None):
+    """ The function compares a file against a string of content and writes the file if it differs """
+    log = LogWrapper()
+    if filename is None or content is None:
+        log.info('Cannot write new file %s as nothing to compare against' % filename)
+        return False
+    if os.path.isfile(filename):
+        with open(filename, "r") as original_file:
+            orig_file_string = original_file.read()
+            if re.sub('[ \n]', '', orig_file_string) == re.sub('[ \n]', '', content):
+                log.debug('File %s has not changed' % filename)
+                write_file = False
+            else:
+                log.info('File %s changed, refreshing' % filename)
+                write_file = True
+    else:
+        write_file = True
+
+    # Creating destination directory files
+    if write_file is True:
+        log.debug('Writing file %s' % filename)
+        with open(filename, 'w') as em_file:
+            em_file.write(content)
+        return True
+    else:
+        return False
+
+def compare_purge_dir(file_list=[], directory=None, pattern=None):
+    """ The function compares a file against a string of content and writes the file if it differs """
+    log = LogWrapper()
+    if directory is None:
+        log.info('Cannot purge directory as no directory specified')
+        return False
+    local_directory = os.walk(directory)
+    for _, _, local_files in local_directory:
+        for local_file in local_files:
+            if pattern is not None:
+                if not local_file.startswith(pattern):
+                    log.debug('File %s is outside our realm, skipping...' % local_file)
+                    continue
+            full_local_filename = "%s/%s" % (directory, local_file)
+            if full_local_filename not in file_list:
+                log.debug('Checking file %s' % full_local_filename)
+                # Remove this file as it shoudldn't be here
+                log.info('Removing file %s' % full_local_filename)
+                try:
+                    os.remove(full_local_filename)
+                except OSError:
+                    log.debug('Can\'t delete file %s, continuing' % full_local_filename)
+    return True
