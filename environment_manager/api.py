@@ -92,6 +92,34 @@ class EMApi(object):
         request_endpoint = '/api/v1/asgs?account=%s' % account
         return self.query(request_endpoint, **kwargs)
 
+    def get_asg_info(self, environment=None, asgname=None, **kwargs):
+        """ Get details from ASG """
+        if environment is None or asgname is None:
+            raise SyntaxError('Either environment or asgname has not been specified')
+        request_endpoint = '/api/v1/asgs/%s?environment=%s' % (asgname, environment)
+        return self.query(request_endpoint, **kwargs)
+
+    def get_asg_ips(self, environment=None, asgname=None, **kwargs):
+        """ Get IPs associated with ASG """
+        if environment is None or asgname is None:
+            raise SyntaxError('Either environment or asgname has not been specified')
+        request_endpoint = '/api/v1/asgs/%s/ips?environment=%s' % (asgname, environment)
+        return self.query(request_endpoint, **kwargs)
+
+    def get_asg_scaling_schedule(self, environment=None, asgname=None, **kwargs):
+        """ Get scaling schedule associated with ASG """
+        if environment is None or asgname is None:
+            raise SyntaxError('Either environment or asgname has not been specified')
+        request_endpoint = '/api/v1/asgs/%s/scaling-schedule?environment=%s' % (asgname, environment)
+        return self.query(request_endpoint, **kwargs)
+
+    def get_asg_launch_config(self, environment=None, asgname=None, **kwargs):
+        """ Get scaling schedule associated with ASG """
+        if environment is None or asgname is None:
+            raise SyntaxError('Either environment or asgname has not been specified')
+        request_endpoint = '/api/v1/asgs/%s/launch-config?environment=%s' % (asgname, environment)
+        return self.query(request_endpoint, **kwargs)
+
     ## Audit
 
     ## Cluster
