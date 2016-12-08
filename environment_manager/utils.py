@@ -6,6 +6,7 @@ import re
 import traceback
 import logging
 import simplejson
+import numbers
 
 class LogWrapper(object):
     """ Instanciates logging wrapper to add useful information to all logs without repeating code """
@@ -132,7 +133,7 @@ def generate_sensu_check(check_name=None,
                          runbook='Needs information',
                          sla='No SLA defined',
                          team=None,
-                         notification_email=None,
+                         notification_email=False,
                          ticket=False,
                          project=False,
                          slack=False,
@@ -148,6 +149,10 @@ def generate_sensu_check(check_name=None,
         raise SyntaxError('Need a valid command to create sensu check')
     if team is None:
         raise SyntaxError('Need to specify a valid team to assign events from this sensu check')
+    # Check numbers
+    for number in [interval, ocurrences, refresh, timeout, alert_after, realert_every]:
+        if not isinstance(number, numbers.Number):
+            raise SyntaxError('This parameter should be a number, instead I have %s' % number)
     content = {'checks':{check_name:{'command': command,
                                      'handlers': handlers,
                                      'interval': interval,
