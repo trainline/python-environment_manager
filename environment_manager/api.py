@@ -3,7 +3,11 @@
 
 import time
 import requests
+from requests.packages.urllib3.exceptions import InsecureRequestWarning
 from environment_manager.utils import LogWrapper, json_encode
+
+# Remove insecure request warning
+requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
 
 class EMApi(object):
     """Defines all api calls and treats them like an object to give proper interfacing"""
@@ -76,11 +80,11 @@ class EMApi(object):
             query_headers = {'Accept': 'application/json', 'Content-Type': 'application/json', 'Authorization': token}
             if query_type.lower() == 'get':
                 request = requests.get(request_url, headers=query_headers, timeout=30, verify=False)
-            if query_type.lower() == 'post':
+            elif query_type.lower() == 'post':
                 request = requests.post(request_url, headers=query_headers, data=json_data, timeout=30, verify=False)
-            if query_type.lower() == 'put':
+            elif query_type.lower() == 'put':
                 request = requests.put(request_url, headers=query_headers, data=json_data, timeout=30, verify=False)
-            if query_type.lower() == 'delete':
+            elif query_type.lower() == 'delete':
                 request = requests.delete(request_url, headers=query_headers, timeout=30, verify=False)
             else:
                 raise SyntaxError('Cannot process query type %s' % query_type)
