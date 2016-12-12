@@ -5,8 +5,11 @@ import os
 import re
 import traceback
 import logging
-import simplejson
 import numbers
+import subprocess
+import random
+import time
+import simplejson
 
 class LogWrapper(object):
     """ Instanciates logging wrapper to add useful information to all logs without repeating code """
@@ -228,3 +231,27 @@ def compare_purge_dir(file_list=[], directory=None, pattern=None):
                 except OSError:
                     log.debug('Can\'t delete file %s, continuing' % full_local_filename)
     return True
+
+def reload_program(command, max_tries=10):
+    """ The function will reload a program, capture output and return the state and exec args """
+    log = LogWrapper()
+    reload_try = True
+    tries = 0
+    while reload_try:
+        log.info('Reloading program %s' % command)
+        myproc = subprocess.Popen(command, shell=True, stdout=subprocess.PIPE)
+        # Write state to file
+        program_run_output = myproc.communicate()
+        program_run_returncode = myproc.returncode
+        log.info('Reload finished %s (%s)' % (command, program_run_returncode))
+        if program_run_returncode == 0:
+            reload_try = False
+        else:
+            if tries >= max_tries:
+                reload_try = False
+            else:
+                tries += 1
+            mysleep = random.randint(1, 10) * 60
+            log.info('Will retry, sleeping for %s seconds' % mysleep)
+            time.sleep(mysleep)
+    return program_run_returncode, program_run_output
