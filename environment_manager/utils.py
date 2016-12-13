@@ -16,7 +16,7 @@ class LogWrapper(object):
 
     def __init__(self):
         """ Initialise logger """
-        self.logger = logging.getLogger(__name__)
+        self.logger = logging.getLogger()
 
     def debug(self, message):
         """ Debug """
