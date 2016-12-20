@@ -96,7 +96,7 @@ class EMApi(object):
                 log.debug(request.__dict__)
                 time.sleep(backoff)
         # General one if we exceeded our retries
-        raise SystemError('Max number of retries (%s) querying Environment Manager, will abort for now' % retries)
+        raise SystemError('Max number of retries (%s) querying Environment Manager, last http code is %s, will abort for now' % (retries, request.status_code))
 
     #######################################################
     # This is a full API implementation based on EM docs  #
