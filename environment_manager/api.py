@@ -91,7 +91,7 @@ class EMApi(object):
             if int(str(request.status_code)[:1]) == 2:
                 return request.json()
             elif int(str(request.status_code)) == 401:
-                raise SystemError('401: Incorrect credentials')
+                pass
             elif int(str(request.status_code)) == 404:
                 raise SystemError('404: Object not found')
             else:
