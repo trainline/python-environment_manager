@@ -135,6 +135,13 @@ class EMApi(object):
         request_endpoint = '/api/v1/asgs/%s?environment=%s' % (asgname, environment)
         return self.query(query_endpoint=request_endpoint, query_type='GET', **kwargs)
 
+    def get_asg_ready(self, environment=None, asgname=None, **kwargs):
+        """ Get details from ASG """
+        if environment is None or asgname is None:
+            raise SyntaxError('Either environment or asgname has not been specified')
+        request_endpoint = '/api/v1/asgs/%s/ready?environment=%s' % (asgname, environment)
+        return self.query(query_endpoint=request_endpoint, query_type='GET', **kwargs)
+
     def get_asg_ips(self, environment=None, asgname=None, **kwargs):
         """ Get IPs associated with ASG """
         if environment is None or asgname is None:
@@ -380,6 +387,15 @@ class EMApi(object):
         if service is None:
             raise SyntaxError('Service has not been specified')
         request_endpoint = '/api/v1/services/%s' % service
+        return self.query(query_endpoint=request_endpoint, query_type='GET', **kwargs)
+
+    def get_service_health(self, service=None, environment=None, **kwargs):
+        """ Get a currently deployed service """
+        if service is None:
+            raise SyntaxError('Service has not been specified')
+        if environment is None:
+            raise SyntaxError('Environment has not been specified')
+        request_endpoint = '/api/v1/services/%s/heath?environment=%s' % (service, environment)
         return self.query(query_endpoint=request_endpoint, query_type='GET', **kwargs)
 
     def get_service_slices(self, service=None, **kwargs):
