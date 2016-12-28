@@ -6,6 +6,7 @@ import re
 import traceback
 import logging
 import numbers
+import types
 import subprocess
 import random
 import time
@@ -145,17 +146,29 @@ def generate_sensu_check(check_name=None,
                          tags=[],
                          **kwargs):
     """ Generates a valid json for a sensu check """
-    # Checks validity of input
+    # Check for compulsory values that need to be provided
     if check_name is None:
         raise SyntaxError('Cannot create sensu check without a name')
     if command is None:
         raise SyntaxError('Need a valid command to create sensu check')
     if team is None:
         raise SyntaxError('Need to specify a valid team to assign events from this sensu check')
-    # Check numbers
+    # Check number values
     for number in [interval, ocurrences, refresh, timeout, alert_after, realert_every]:
         if not isinstance(number, numbers.Number):
             raise SyntaxError('This parameter should be a number, instead I have %s' % number)
+    # Check boolean values
+    for boolean in [standalone, aggregate, notification_email, ticket, project, slack, page]:
+        if not isinstance(boolean, types.BooleanType):
+            raise SyntaxError('Parameter %s should be a boolean' % boolean)
+    # Check for regexp validity of some fields
+    if re.match('^[\w\.-]+$', check_name) is None:
+        raise SyntaxError('check_name is incorrect, it can only have alphanumerical characters and "-", "_" or "."')
+    # Check for logic
+    if standalone is True and aggregate is True:
+        raise SyntaxError('Either standalone or aggregate can be True at the same time')
+    if standalone is False and aggregate is False:
+        raise SyntaxError('Either standalone or aggregate can be False at the same time')
     content = {'checks':{check_name:{'command': command,
                                      'handlers': handlers,
                                      'interval': interval,
