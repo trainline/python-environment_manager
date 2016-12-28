@@ -395,7 +395,7 @@ class EMApi(object):
             raise SyntaxError('Service has not been specified')
         if environment is None:
             raise SyntaxError('Environment has not been specified')
-        request_endpoint = '/api/v1/services/%s/heath?environment=%s' % (service, environment)
+        request_endpoint = '/api/v1/services/%s/health?environment=%s' % (service, environment)
         return self.query(query_endpoint=request_endpoint, query_type='GET', **kwargs)
 
     def get_service_slices(self, service=None, **kwargs):
