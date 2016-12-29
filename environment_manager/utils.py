@@ -137,10 +137,10 @@ def generate_sensu_check(check_name=None,
                          runbook='Needs information',
                          sla='No SLA defined',
                          team=None,
-                         notification_email=False,
+                         notification_email=None,
                          ticket=False,
                          project=False,
-                         slack=False,
+                         slack_channel=None,
                          page=False,
                          tip='Fill me up with information',
                          tags=[],
@@ -158,7 +158,7 @@ def generate_sensu_check(check_name=None,
         if not isinstance(number, numbers.Number):
             raise SyntaxError('This parameter should be a number, instead I have %s' % number)
     # Check boolean values
-    for boolean in [standalone, aggregate, notification_email, ticket, project, slack, page]:
+    for boolean in [standalone, aggregate, ticket, page]:
         if not isinstance(boolean, types.BooleanType):
             raise SyntaxError('Parameter %s should be a boolean' % boolean)
     # Check for regexp validity of some fields
@@ -186,7 +186,7 @@ def generate_sensu_check(check_name=None,
                                      'notification_email': notification_email,
                                      'ticket': ticket,
                                      'project': project,
-                                     'slack': slack,
+                                     'slack_channel': slack_channel,
                                      'page': page,
                                      'tip': tip,
                                      'tags': tags}}}
