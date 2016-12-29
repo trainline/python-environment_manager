@@ -126,7 +126,7 @@ def generate_sensu_check(check_name=None,
                          command=None,
                          handlers=['default'],
                          interval=120,
-                         ocurrences=5,
+                         occurrences=5,
                          refresh=300,
                          subscribers=['sensu-base'],
                          standalone=True,
@@ -154,7 +154,7 @@ def generate_sensu_check(check_name=None,
     if team is None:
         raise SyntaxError('Need to specify a valid team to assign events from this sensu check')
     # Check number values
-    for number in [interval, ocurrences, refresh, timeout, alert_after, realert_every]:
+    for number in [interval, occurrences, refresh, timeout, alert_after, realert_every]:
         if not isinstance(number, numbers.Number):
             raise SyntaxError('This parameter should be a number, instead I have %s' % number)
     # Check boolean values
@@ -172,7 +172,7 @@ def generate_sensu_check(check_name=None,
     content = {'checks':{check_name:{'command': command,
                                      'handlers': handlers,
                                      'interval': interval,
-                                     'ocurrences': ocurrences,
+                                     'occurrences': occurrences,
                                      'refresh': refresh,
                                      'subscribers': subscribers,
                                      'standalone': standalone,
