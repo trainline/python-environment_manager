@@ -241,7 +241,7 @@ def compare_purge_dir(file_list=[], directory=None, pattern=None):
                     log.debug('Can\'t delete file %s, continuing' % full_local_filename)
     return True
 
-def reload_program(command, max_tries=10):
+def reload_program(command, max_tries=10, sleep_time=30):
     """ The function will reload a program, capture output and return the state and exec args """
     log = LogWrapper()
     reload_try = True
@@ -260,7 +260,7 @@ def reload_program(command, max_tries=10):
                 reload_try = False
             else:
                 tries += 1
-            mysleep = random.randint(1, 10) * 60
+            mysleep = random.randint(1, sleep_time)
             log.info('Will retry, sleeping for %s seconds' % mysleep)
             time.sleep(mysleep)
     return program_run_returncode, program_run_output
