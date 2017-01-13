@@ -152,7 +152,7 @@ def generate_sensu_check(check_name=None,
     if team is None:
         raise SyntaxError('Need to specify a valid team to assign events from this sensu check')
     # Check number values
-    for number in [interval, occurrences, refresh, timeout, alert_after, realert_every]:
+    for number in [interval, timeout, alert_after, realert_every]:
         if not isinstance(number, numbers.Number):
             raise SyntaxError('This parameter should be a number, instead I have %s' % number)
     # Check boolean values
