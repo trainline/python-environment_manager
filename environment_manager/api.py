@@ -234,11 +234,11 @@ class EMApi(object):
         # Construct qs
         if since is None and until is not None:
             constructed_qs = '?%s' % until_qs
-        if since is not None and until is None:
+        elif since is not None and until is None:
             constructed_qs = '?%s' % since_qs
-        if since is not None and until is not None:
-            constructed_qs = '?%s,%s' % (since_qs, until_qs)
-        if since is None and until is None:
+        elif since is not None and until is not None:
+            constructed_qs = '?%s&%s' % (since_qs, until_qs)
+        else:
             constructed_qs = ''
         request_endpoint = '/api/v1/config/audit%s' % constructed_qs
         return self.query(query_endpoint=request_endpoint, query_type='GET', **kwargs)
@@ -435,11 +435,11 @@ class EMApi(object):
         # Construct qs
         if environmenttype is None and cluster is not None:
             constructed_qs = '?%s' % cluster_qs
-        if environmenttype is not None and cluster is None:
+        elif environmenttype is not None and cluster is None:
             constructed_qs = '?%s' % environmenttype_qs
-        if environmenttype is not None and cluster is not None:
-            constructed_qs = '?%s,%s' % (environmenttype_qs, cluster_qs)
-        if environmenttype is None and cluster is None:
+        elif environmenttype is not None and cluster is not None:
+            constructed_qs = '?%s&%s' % (environmenttype_qs, cluster_qs)
+        else:
             constructed_qs = ''
         request_endpoint = '/api/v1/config/environments%s' % constructed_qs
         return self.query(query_endpoint=request_endpoint, query_type='GET', **kwargs)
