@@ -743,8 +743,8 @@ class EMApi(object):
         if service is None:
             raise SyntaxError('Service has not been specified')
         if environment is None:
-            raise SyntaxError('Environment has not been specified')        
-        request_endpoint = '/api/v1/services/%s/slices?environment=' % (service, environment)
+            raise SyntaxError('Environment has not been specified')
+        request_endpoint = '/api/v1/services/%s/slices?environment=%s' % (service, environment)
         if active is not None:
             request_endpoint = '%s&active=%s' % (request_endpoint, active)
         return self.query(query_endpoint=request_endpoint, query_type='GET', **kwargs)
