@@ -716,8 +716,8 @@ class EMApi(object):
         request_endpoint = '/api/v1/services/%s/asgs?environment=%s%s' % (service, environment, slice_qs)
         return self.query(query_endpoint=request_endpoint, query_type='GET', **kwargs)
 
-    def get_service_health(self, service=None, environment=None, **kwargs):
-        """ Get a currently deployed service """
+    def get_service_overall_health(self, service=None, environment=None, **kwargs):
+        """ Get a overall health for a deployed service """
         if service is None:
             raise SyntaxError('Service has not been specified')
         if environment is None:
@@ -725,6 +725,21 @@ class EMApi(object):
         request_endpoint = '/api/v1/services/%s/health?environment=%s' % (service, environment)
         return self.query(query_endpoint=request_endpoint, query_type='GET', **kwargs)
 
+    def get_service_health(self, service=None, environment=None, slice=None, serverRole=None, **kwargs):
+        """ Get health for a specific service """
+        if service is None:
+            raise SyntaxError('Service has not been specified')
+        if environment is None:
+            raise SyntaxError('Environment has not been specified')
+        if slice is None:
+            raise SyntaxError('Slice has not been specified')
+
+        request_endpoint = '/api/v1/services/%s/health/%s?environment=%s' % (service, slice, environment)
+        if serverRole is not None:
+            request_endpoint = '%s&serverRole=%s' % (request_endpoint, serverRole)
+
+        return self.query(query_endpoint=request_endpoint, query_type='GET', **kwargs)
+    
     def get_service_slices(self, service=None, **kwargs):
         """ Get slices for a deployed service """
         if service is None:
