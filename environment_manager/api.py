@@ -96,7 +96,7 @@ class EMApi(object):
             if int(str(request.status_code)[:1]) == 2:
                 return request.json()
             elif int(str(request.status_code)[:1]) == 4 or int(str(request.status_code)[:1]) == 5:
-                raise ValueError(request.json()['originalException']['message'])
+                raise ValueError(request.json()['error'])
             else:
                 log.info('Got a status %s from EM, cant serve, retrying' % request.status_code)
                 log.debug(request.request.headers)
