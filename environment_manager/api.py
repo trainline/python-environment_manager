@@ -738,11 +738,15 @@ class EMApi(object):
             request_endpoint = '%s&serverRole=%s' % (request_endpoint, server_role)
         return self.query(query_endpoint=request_endpoint, query_type='GET', **kwargs)
 
-    def get_service_slices(self, service=None, **kwargs):
+    def get_service_slices(self, service=None, environment=None, active=None, **kwargs):
         """ Get slices for a deployed service """
         if service is None:
             raise SyntaxError('Service has not been specified')
-        request_endpoint = '/api/v1/services/%s/slices' % service
+        if environment is None:
+            raise SyntaxError('Environment has not been specified')        
+        request_endpoint = '/api/v1/services/%s/slices?environment=' % (service, environment)
+        if active is not None:
+            request_endpoint = '%s&active=%s' % (request_endpoint, active)
         return self.query(query_endpoint=request_endpoint, query_type='GET', **kwargs)
 
     def put_service_slices_toggle(self, service=None, environment=None, **kwargs):
