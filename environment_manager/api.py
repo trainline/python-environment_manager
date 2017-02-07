@@ -313,7 +313,7 @@ class EMApi(object):
             raise SyntaxError('Deployment id has not been specified')
         if instance is None:
             raise SyntaxError('Instance id has not been specified')
-        request_endpoint = '/api/v1/deployments/%s/log?account=%s,instance=%s' % (deployment_id, account, instance)
+        request_endpoint = '/api/v1/deployments/%s/log?account=%s&instance=%s' % (deployment_id, account, instance)
         return self.query(query_endpoint=request_endpoint, query_type='GET', **kwargs)
 
     ## Deployment Map
@@ -523,7 +523,7 @@ class EMApi(object):
         """ Import a configuration resources dynamo table """
         if resource is None or account is None or mode is None:
             raise SyntaxError('Resource or account has not been specified')
-        request_endpoint = '/api/v1/config/import/%s?account=%s,mode=%s' % (resource, account, mode)
+        request_endpoint = '/api/v1/config/import/%s?account=%s&mode=%s' % (resource, account, mode)
         return self.query(query_endpoint=request_endpoint, query_type='PUT', data=data, **kwargs)
 
     ## Instance
