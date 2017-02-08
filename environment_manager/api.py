@@ -94,9 +94,16 @@ class EMApi(object):
             else:
                 raise SyntaxError('Cannot process query type %s' % query_type)
             if int(str(request.status_code)[:1]) == 2:
-                return request.json()
+                try:
+                    return request.json()
+                except ValueError:
+                    return request.text
             elif int(str(request.status_code)[:1]) == 4 or int(str(request.status_code)[:1]) == 5:
-                raise ValueError(request.json()['error'])
+                try:
+                    error_msg = request.json()['error']
+                except:
+                    error_msg = "An unknown error occured"
+                raise ValueError(error_msg)
             else:
                 log.info('Got a status %s from EM, cant serve, retrying' % request.status_code)
                 log.debug(request.request.headers)
