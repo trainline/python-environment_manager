@@ -142,13 +142,13 @@ class EMApi(object):
         return self.query(query_endpoint=request_endpoint, query_type='DELETE', **kwargs)
 
     ## AMI
-    def get_images_config(self, account=None, **kwargs):
+    def get_images(self, account=None, **kwargs):
         """ Get the list of available AMI images. Only those that are privately published under associated accounts are included """
         if account is None:
             account_qs = ''
         else:
             account_qs = '?account=%s' % account
-        request_endpoint = '/api/v1/config/images%s' % account_qs
+        request_endpoint = '/api/v1/images%s' % account_qs
         return self.query(query_endpoint=request_endpoint, query_type='GET', **kwargs)
 
     ## ASG
