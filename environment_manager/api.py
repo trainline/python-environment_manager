@@ -61,12 +61,9 @@ class EMApi(object):
         if query_endpoint is None:
             log.info('No endpoint specified, cant just go and query nothing')
             raise SyntaxError('No endpoint specified, cant just go and query nothing')
-        if query_type.lower() == 'put' or query_type.lower() == 'post':
-            if data is None:
-                log.info('No data specified, we need to send data with method %s' % query_type)
-                raise SyntaxError('No data specified, we need to send data with method %s' % query_type)
-            else:
-                json_data = json_encode(data)
+        if query_type.lower() == 'post' and data is None:
+            log.info('No data specified, we need to send data with method %s' % query_type)
+            raise SyntaxError('No data specified, we need to send data with method %s' % query_type)
         retry_num = 0
         while retry_num < retries:
             retry_num += 1
@@ -81,18 +78,17 @@ class EMApi(object):
             if isinstance(headers, dict):
                 for header in headers:
                     query_headers.update(header)
-            if query_type.lower() == 'get':
-                request = requests.get(request_url, headers=query_headers, timeout=30, verify=False)
-            elif query_type.lower() == 'post':
-                request = requests.post(request_url, headers=query_headers, data=json_data, timeout=30, verify=False)
-            elif query_type.lower() == 'put':
-                request = requests.put(request_url, headers=query_headers, data=json_data, timeout=30, verify=False)
-            elif query_type.lower() == 'patch':
-                request = requests.patch(request_url, headers=query_headers, data=json_data, timeout=30, verify=False)
-            elif query_type.lower() == 'delete':
-                request = requests.delete(request_url, headers=query_headers, timeout=30, verify=False)
-            else:
+
+            request_values = {'url':request_url, 'headers':query_headers, 'timeout':30, 'verify':False}
+            if data is not None:
+                request_values['data'] = json_encode(data)
+
+            request_method = getattr(requests, query_type.lower())
+            if request_method is None:
                 raise SyntaxError('Cannot process query type %s' % query_type)
+
+            request = request_method(**request_values)
+            
             if int(str(request.status_code)[:1]) == 2:
                 try:
                     return request.json()
