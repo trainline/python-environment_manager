@@ -32,15 +32,15 @@ class EMApi(object):
         # Build base url
         base_url = 'https://%s' % self.server
         # Request token
-        token_payload = {'grant_type': 'password',
-                         'username': self.user,
+        token_payload = {'username': self.user,
                          'password': self.password}
         token = None
         no_token = True
         retries = 0
         while no_token and retries < self.retries:
-            em_token_url = '%s/api/token' % base_url
-            em_token = requests.post(em_token_url, data=token_payload, timeout=5, verify=False)
+            em_token_url = '%s/api/v1/token' % base_url
+            headers = {'Accept': 'application/json', 'Content-Type': 'application/json'}
+            em_token = requests.post(em_token_url, data=json_encode(token_payload), headers=headers, timeout=5, verify=False)
             if int(str(em_token.status_code)[:1]) == 2:
                 token = em_token.text
                 no_token = False
@@ -88,7 +88,7 @@ class EMApi(object):
                 raise SyntaxError('Cannot process query type %s' % query_type)
 
             request = request_method(**request_values)
-            
+
             if int(str(request.status_code)[:1]) == 2:
                 try:
                     return request.json()
