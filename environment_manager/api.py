@@ -12,13 +12,16 @@ requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
 class EMApi(object):
     """Defines all api calls and treats them like an object to give proper interfacing"""
 
-    def __init__(self, server=None, user=None, password=None, retries=5):
+    def __init__(self, server=None, user=None, password=None, retries=5, default_headers={}):
         """ Initialise new API object """
         self.server = server
         self.user = user
         self.password = password
         self.retries = retries
+        self.default_headers = {'Accept': 'application/json', 'Content-Type': 'application/json'}
+        self.default_headers.update(default_headers)
         self.token = None
+        
         # Sanitise input
         if server is None or user is None or password is None:
             raise ValueError('EMApi(server=SERVERNAME, user=USERNAME, password=PASSWORD, [retries=N])')
@@ -39,8 +42,7 @@ class EMApi(object):
         retries = 0
         while no_token and retries < self.retries:
             em_token_url = '%s/api/v1/token' % base_url
-            headers = {'Accept': 'application/json', 'Content-Type': 'application/json'}
-            em_token = requests.post(em_token_url, data=json_encode(token_payload), headers=headers, timeout=5, verify=False)
+            em_token = requests.post(em_token_url, data=json_encode(token_payload), headers=self.default_headers, timeout=5, verify=False)
             if int(str(em_token.status_code)[:1]) == 2:
                 token = em_token.text
                 no_token = False
@@ -74,10 +76,10 @@ class EMApi(object):
             base_url = 'https://%s' % self.server
             request_url = '%s%s' % (base_url, query_endpoint)
             log.debug('Calling URL %s' % request_url)
-            query_headers = {'Accept': 'application/json', 'Content-Type': 'application/json', 'Authorization': token}
+            query_headers = self.default_headers.copy()
+            query_headers.update({'Authorization': token})
             if isinstance(headers, dict):
-                for header in headers:
-                    query_headers.update(header)
+                query_headers.update(headers)
 
             request_values = {'url':request_url, 'headers':query_headers, 'timeout':30, 'verify':False}
             if data is not None:
