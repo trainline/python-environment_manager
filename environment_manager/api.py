@@ -88,13 +88,14 @@ class EMApi(object):
                 raise SyntaxError('Cannot process query type %s' % query_type)
 
             request = request_method(**request_values)
+            status_type = int(str(request.status_code)[:1])
 
-            if int(str(request.status_code)[:1]) == 2:
+            if status_type == 2 or status_type == 3:
                 try:
                     return request.json()
                 except ValueError:
                     return request.text
-            elif int(str(request.status_code)[:1]) == 4 or int(str(request.status_code)[:1]) == 5:
+            elif status_type == 4:
                 try:
                     error_msg = request.json()['error']
                 except:
