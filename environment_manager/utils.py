@@ -122,6 +122,34 @@ def json_decode(string):
         return None
     return decoded_json
 
+def json_load_file(input_file, retries=10, sleep_time=0.1):
+    """ Load a JSON file and decode it, we keep an eye on malformed json outputs """
+    log = LogWrapper()
+    missing_data = True
+    output_object = None
+    current_retry = 1
+    while missing_data:
+        if retries < current_retry:
+            log.error('Cannot read file %s after trying %s times, aborting' % (input_file, retries))
+            raise SystemError
+        else:
+            retries += 1
+        try:
+            with open(input_file, 'r') as input_stream:
+                try:
+                    output_object = json_decode(input_stream.read())
+                except Exception:
+                    log.debug('Found a json decode issue, retrying')
+                    continue
+                if output_object is not None:
+                    missing_data = False
+                else:
+                    time.sleep(sleep_time)
+        except Exception as error:
+            log.error('Cannot open file for reading: %s' % input_file)
+            raise error
+    return output_object
+
 def generate_sensu_check(check_name=None,
                          command=None,
                          handlers=['default'],
