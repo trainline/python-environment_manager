@@ -101,7 +101,10 @@ class EMApi(object):
                 try:
                     error_msg = request.json()['error']
                 except:
-                    error_msg = "An unknown error occured"
+                    try:
+                        error_msg = request.json()['errors']
+                    except:
+                        error_msg = 'An unknown error occured'
                 raise ValueError(error_msg)
             else:
                 log.info('Got a status %s from EM, cant serve, retrying' % request.status_code)
