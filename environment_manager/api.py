@@ -52,8 +52,8 @@ class EMApi(object):
                 else:
                     log.debug('Could not authenticate, trying again: %s' % em_token.status_code)
                     time.sleep(2)
-            except (ConnectionError, Timeout) as e:
-                log.debug('There was a problem with the connection, trying again; error = %s' % e)
+            except (ConnectionError, Timeout) as error:
+                log.debug('There was a problem with the connection, trying again: %s' % error.message)
                 time.sleep(2)
         if token is not None:
             # Got token now lets get URL
@@ -63,13 +63,15 @@ class EMApi(object):
             raise SystemError('Could not authenticate against Environment Manager')
 
     def _get_token(self):
+        """ Internal function to get a new token """
         if self.token is None:
             self.token = self._api_auth()
         return self.token
 
     def _renew_token(self):
+        """ Internal function to renew a token """
         self.token = self._api_auth()
-        
+
     def query(self, query_endpoint=None, data=None, headers={}, query_type='get', retries=5, backoff=2):
         """ Function to querying Environment Manager """
         log = LogWrapper()
@@ -105,8 +107,8 @@ class EMApi(object):
             request = None
             try:
                 request = request_method(**request_values)
-            except (ConnectionError, Timeout) as e:
-                log.debug('There was a problem with the connection, trying again; error = ' % e)
+            except (ConnectionError, Timeout) as error:
+                log.debug('There was a problem with the connection, trying again: ' % error.message)
                 continue
             status_type = int(str(request.status_code)[:1])
 
