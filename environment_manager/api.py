@@ -3,6 +3,7 @@
 
 import time
 import requests
+from requests.exceptions import *
 from requests.packages.urllib3.exceptions import InsecureRequestWarning
 from environment_manager.utils import LogWrapper, json_encode
 
@@ -21,7 +22,7 @@ class EMApi(object):
         self.default_headers = {'Accept': 'application/json', 'Content-Type': 'application/json'}
         self.default_headers.update(default_headers)
         self.token = None
-        
+
         # Sanitise input
         if server is None or user is None or password is None:
             raise ValueError('EMApi(server=SERVERNAME, user=USERNAME, password=PASSWORD, [retries=N])')
@@ -41,15 +42,18 @@ class EMApi(object):
         no_token = True
         retries = 0
         while no_token and retries < self.retries:
-            em_token_url = '%s/api/v1/token' % base_url
-            em_token = requests.post(em_token_url, data=json_encode(token_payload), headers=self.default_headers, timeout=5, verify=False)
-            if int(str(em_token.status_code)[:1]) == 2:
-                token = em_token.text
-                no_token = False
-            else:
-                log.debug('Could not authenticate, trying again: %s' % em_token.status_code)
-                time.sleep(2)
-            retries += 1
+            try:
+                retries += 1
+                em_token_url = '%s/api/v1/token' % base_url
+                em_token = requests.post(em_token_url, data=json_encode(token_payload), headers=self.default_headers, timeout=5, verify=False)
+                if int(str(em_token.status_code)[:1]) == 2:
+                    token = em_token.text
+                    no_token = False
+                else:
+                    log.debug('Could not authenticate, trying again: %s' % em_token.status_code)
+                    time.sleep(2)
+            except (ConnectionError, Timeout) as e:
+                log.debug('There was a problem with the connection, trying again; error = %s' % e)
         if token is not None:
             # Got token now lets get URL
             token_bearer = 'Bearer %s' % token
@@ -57,6 +61,14 @@ class EMApi(object):
         else:
             raise SystemError('Could not authenticate against Environment Manager')
 
+    def _get_token(self):
+        if self.token is None:
+            self.token = self._api_auth()
+        return self.token
+
+    def _renew_token(self):
+        self.token = self._api_auth()
+        
     def query(self, query_endpoint=None, data=None, headers={}, query_type='get', retries=5, backoff=2):
         """ Function to querying Environment Manager """
         log = LogWrapper()
@@ -70,7 +82,7 @@ class EMApi(object):
         while retry_num < retries:
             retry_num += 1
             log.debug('Going through query iteration %s out of %s' % (retry_num, retries))
-            token = self._api_auth()
+            token = self._get_token()
             log.debug('Using token %s for auth' % token)
             # Build base url
             base_url = 'https://%s' % self.server
@@ -89,7 +101,12 @@ class EMApi(object):
             if request_method is None:
                 raise SyntaxError('Cannot process query type %s' % query_type)
 
-            request = request_method(**request_values)
+            request = None
+            try:
+                request = request_method(**request_values)
+            except (ConnectionError, Timeout) as e:
+                log.debug('There was a problem with the connection, trying again; error = ' % e)
+                continue
             status_type = int(str(request.status_code)[:1])
 
             if status_type == 2 or status_type == 3:
@@ -104,7 +121,12 @@ class EMApi(object):
                     try:
                         error_msg = request.json()['errors']
                     except:
-                        error_msg = 'An unknown error occured'
+                        if request.text == 'jwt expired' or request.text == 'invalid token':
+                            log.info('Your auth token expired or is inavlid, re-authenticating and attempting request again...')
+                            self._renew_token()
+                            continue
+                        else:
+                            error_msg = 'An unknown error occured'
                 raise ValueError(error_msg)
             else:
                 log.info('Got a status %s from EM, cant serve, retrying' % request.status_code)
