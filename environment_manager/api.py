@@ -54,6 +54,7 @@ class EMApi(object):
                     time.sleep(2)
             except (ConnectionError, Timeout) as e:
                 log.debug('There was a problem with the connection, trying again; error = %s' % e)
+                time.sleep(2)
         if token is not None:
             # Got token now lets get URL
             token_bearer = 'Bearer %s' % token
