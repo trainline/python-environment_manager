@@ -599,7 +599,7 @@ class EMApi(object):
         """ Get load balancer data """
         if id is None:
             raise SyntaxError('Load Balancer ID has not been specified')
-        request_endpoint = '/api/v1/config/load-balancer/%s' % id
+        request_endpoint = '/api/v1/load-balancer/%s' % id
         return self.query(query_endpoint=request_endpoint, query_type='GET', **kwargs)
 
     def get_lbsettings_config(self, **kwargs):
