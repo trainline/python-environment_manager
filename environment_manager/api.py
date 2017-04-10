@@ -876,11 +876,11 @@ class EMApi(object):
         return self.query(query_endpoint=request_endpoint, query_type='DELETE', **kwargs)
 
     ## Upstream
-    def get_upstream_slices(self, upstream=None, **kwargs):
+    def get_upstream_slices(self, upstream=None, environment=None, **kwargs):
         """ Get slices for a given upstream """
-        if upstream is None:
-            raise SyntaxError('Upstream name has not been specified')
-        request_endpoint = '/api/v1/upstreams/%s/slices' % upstream
+        if upstream is None or environment is None:
+            raise SyntaxError('You must provide an upstream and environment')
+        request_endpoint = '/api/v1/upstreams/%s/slices?environment=%s' % (upstream, environment)
         return self.query(query_endpoint=request_endpoint, query_type='GET', **kwargs)
 
     def put_upstream_slices_toggle(self, upstream=None, environment=None, **kwargs):
