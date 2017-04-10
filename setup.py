@@ -2,11 +2,11 @@
 from setuptools import setup
 
 setup(name='environment_manager',
-      version='0.2.1',
+      version='0.2.2',
       description="A Client library for Environment Manager",
       url="https://github.com/trainline/python-environment_manager",
-      author="Marc Cluet",
-      author_email="marc.cluet@thetrainline.com",
+      author="Trainline Engineering",
+      author_email="platform.development@thetrainline.com",
       install_requires=['requests', 'simplejson'],
       license='Apache 2.0',
       classifiers=['Development Status :: 3 - Alpha',
