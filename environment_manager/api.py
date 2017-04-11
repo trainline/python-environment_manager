@@ -561,7 +561,7 @@ class EMApi(object):
         return self.query(query_endpoint=request_endpoint, query_type='PUT', data=data, **kwargs)
 
     ## Instance
-    def get_instances(self, environment=None, cluster=None, **kwargs):
+    def get_instances(self, environment=None, cluster=None, account=None, **kwargs):
         """ Get all instances matching the given criteria """
         request_endpoint = '/api/v1/instances'
         queries = []
@@ -569,6 +569,8 @@ class EMApi(object):
             queries.append('environment={0}'.format(environment))
         if cluster is not None:
             queries.append('cluster={0}'.format(cluster))
+        if account is not None:
+            queries.append('account={0}'.format(account))
         if queries:
             request_endpoint += '?{0}'.format('&'.join(queries))
         return self.query(query_endpoint=request_endpoint, query_type='GET', **kwargs)
