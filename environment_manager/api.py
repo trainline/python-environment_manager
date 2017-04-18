@@ -108,7 +108,7 @@ class EMApi(object):
             try:
                 request = request_method(**request_values)
             except (ConnectionError, Timeout) as error:
-                log.debug('There was a problem with the connection, trying again: ' % error.message)
+                log.debug('There was a problem with the connection, trying again')
                 continue
             status_type = int(str(request.status_code)[:1])
 
