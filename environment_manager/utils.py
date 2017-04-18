@@ -118,7 +118,7 @@ def json_decode(string):
     try:
         decoded_json = simplejson.loads(string)
     except simplejson.JSONDecodeError:
-        log.error('Can\'t decode JSON string: %s' % string)
+        log.debug('Can\'t decode JSON string: %s' % string)
         return None
     return decoded_json
 
