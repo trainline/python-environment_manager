@@ -128,6 +128,8 @@ class EMApi(object):
                             log.info('Your auth token expired or is inavlid, re-authenticating and attempting request again...')
                             self._renew_token()
                             continue
+                        elif request.text:
+                            error_msg = request.text
                         else:
                             error_msg = 'An unknown error occured'
                 raise ValueError(error_msg)
