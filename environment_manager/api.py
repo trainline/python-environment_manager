@@ -606,9 +606,14 @@ class EMApi(object):
         request_endpoint = '/api/v1/load-balancer/%s' % id
         return self.query(query_endpoint=request_endpoint, query_type='GET', **kwargs)
 
-    def get_lbsettings_config(self, **kwargs):
+    def get_lbsettings_config(self, query_type, query_value, **kwargs):
         """ List all load balancer settings """
-        request_endpoint = '/api/v1/config/lb-settings'
+        query_type = query_type.lower()
+        if query_type != 'environment' and query_type != 'load-balancer-group':
+            raise SyntaxError('query_type must be either environment or load-balancer-group')
+        if not isinstance(query_value, list):
+            raise SyntaxError('query_value must be an array')
+        request_endpoint = '/api/v1/config/lb-settings?qa={0}&qv={1}'.format(query_type, ','.join(query_value))
         return self.query(query_endpoint=request_endpoint, query_type='GET', **kwargs)
 
     def post_lbsettings_config(self, data={}, **kwargs):
@@ -894,9 +899,14 @@ class EMApi(object):
         request_endpoint = '/api/v1/upstreams/%s/slices/toggle?environment=%s' % (upstream, environment)
         return self.query(query_endpoint=request_endpoint, query_type='GET', **kwargs)
 
-    def get_upstreams_config(self, **kwargs):
+    def get_upstreams_config(self, query_type, query_value, **kwargs):
         """ Get all upstream configurations """
-        request_endpoint = '/api/v1/config/upstreams'
+        query_type = query_type.lower()
+        if query_type != 'environment' and query_type != 'load-balancer-group':
+            raise SyntaxError('query_type must be either environment or load-balancer-group')
+        if not isinstance(query_value, list):
+            raise SyntaxError('query_value must be an array')
+        request_endpoint = '/api/v1/config/upstreams?qa={0}&qv={1}'.format(query_type, ','.join(query_value))
         return self.query(query_endpoint=request_endpoint, query_type='GET', **kwargs)
 
     def post_upstreams_config(self, data={}, **kwargs):
