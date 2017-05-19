@@ -606,14 +606,16 @@ class EMApi(object):
         request_endpoint = '/api/v1/load-balancer/%s' % id
         return self.query(query_endpoint=request_endpoint, query_type='GET', **kwargs)
 
-    def get_lbsettings_config(self, query_type, query_value, **kwargs):
+    def get_lbsettings_config(self, query_type=None, query_value=None, **kwargs):
         """ List all load balancer settings """
-        query_type = query_type.lower()
-        if query_type != 'environment' and query_type != 'load-balancer-group':
-            raise SyntaxError('query_type must be either environment or load-balancer-group')
-        if not isinstance(query_value, list):
-            raise SyntaxError('query_value must be an array')
-        request_endpoint = '/api/v1/config/lb-settings?qa={0}&qv={1}'.format(query_type, ','.join(query_value))
+        if query_type and query_value:
+            if query_type.lower() not in ['environment', 'load-balancer-group']:
+                raise SyntaxError('query_type must be either environment or load-balancer-group')
+            if not isinstance(query_value, list):
+                raise SyntaxError('query_value must be an array')
+            request_endpoint = '/api/v1/config/lb-settings?qa=%s&qv=%s' % (query_type.lower(), ','.join(query_value))
+        else:
+            request_endpoint = '/api/v1/config/lb-settings'
         return self.query(query_endpoint=request_endpoint, query_type='GET', **kwargs)
 
     def post_lbsettings_config(self, data={}, **kwargs):
@@ -899,14 +901,16 @@ class EMApi(object):
         request_endpoint = '/api/v1/upstreams/%s/slices/toggle?environment=%s' % (upstream, environment)
         return self.query(query_endpoint=request_endpoint, query_type='GET', **kwargs)
 
-    def get_upstreams_config(self, query_type, query_value, **kwargs):
+    def get_upstreams_config(self, query_type=None, query_value=None, **kwargs):
         """ Get all upstream configurations """
-        query_type = query_type.lower()
-        if query_type != 'environment' and query_type != 'load-balancer-group':
-            raise SyntaxError('query_type must be either environment or load-balancer-group')
-        if not isinstance(query_value, list):
-            raise SyntaxError('query_value must be an array')
-        request_endpoint = '/api/v1/config/upstreams?qa={0}&qv={1}'.format(query_type, ','.join(query_value))
+        if query_type and query_value:
+            if query_type.lower() not in ['environment', 'load-balancer-group']:
+                raise SyntaxError('query_type must be either environment or load-balancer-group')
+            if not isinstance(query_value, list):
+                raise SyntaxError('query_value must be an array')
+            request_endpoint = '/api/v1/config/upstreams?qa=%s&qv=%s' % (query_type.lower(), ','.join(query_value))
+        else:
+            request_endpoint = '/api/v1/config/upstreams'
         return self.query(query_endpoint=request_endpoint, query_type='GET', **kwargs)
 
     def post_upstreams_config(self, data={}, **kwargs):
