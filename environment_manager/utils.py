@@ -3,6 +3,7 @@
 
 import os
 import re
+import ast
 import traceback
 import logging
 import numbers
@@ -103,6 +104,14 @@ def to_list(value):
     """ Create an array from any kind of object """
     initial_list = [x.strip() for x in value.translate(None, '!@#$[]{}\'"').split(',')]
     return [x for x in initial_list if x]
+
+def to_dict(value):
+    """ Create a dictionary from any kind of incoming object """
+    if isinstance(value, dict):
+        myreturn = value
+    else:
+        myreturn = ast.literal_eval(value)
+    return myreturn
 
 def function_name():
     """ Return the name of the function calling this code """
