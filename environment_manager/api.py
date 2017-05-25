@@ -319,9 +319,13 @@ class EMApi(object):
         return self.query(query_endpoint=request_endpoint, query_type='DELETE', **kwargs)
 
     ## Deployment
-    def get_deployments(self, **kwargs):
+    def get_deployments(self, query_args=None, **kwargs):
         """ List all deployments matching the given criteria. If no parameters are provided, the default is 'since yesterday' """
         request_endpoint = '/api/v1/deployments'
+        if query_args is not None:
+            q = [ '{0}={1}'.format(key, val) for key,val in query_args.items() ]
+            q = '&'.join(q)
+            request_endpoint = '{0}?{1}'.format(request_endpoint, q)
         return self.query(query_endpoint=request_endpoint, query_type='GET', **kwargs)
 
     def post_deployments(self, dry_run=False, data={}, **kwargs):
