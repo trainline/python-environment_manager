@@ -5,7 +5,7 @@ import time
 import requests
 from requests.exceptions import *
 from requests.packages.urllib3.exceptions import InsecureRequestWarning
-from environment_manager.utils import LogWrapper, json_encode
+from environment_manager.utils import LogWrapper, json_encode, to_list
 
 # Remove insecure request warning
 requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
@@ -611,6 +611,7 @@ class EMApi(object):
         if query_type and query_value:
             if query_type.lower() not in ['environment', 'load-balancer-group']:
                 raise SyntaxError('query_type must be either environment or load-balancer-group')
+            query_value = to_list(query_value)
             if not isinstance(query_value, list):
                 raise SyntaxError('query_value must be an array')
             request_endpoint = '/api/v1/config/lb-settings?qa=%s&qv=%s' % (query_type.lower(), ','.join(query_value))
@@ -906,6 +907,7 @@ class EMApi(object):
         if query_type and query_value:
             if query_type.lower() not in ['environment', 'load-balancer-group']:
                 raise SyntaxError('query_type must be either environment or load-balancer-group')
+            query_value = to_list(query_value)
             if not isinstance(query_value, list):
                 raise SyntaxError('query_value must be an array')
             request_endpoint = '/api/v1/config/upstreams?qa=%s&qv=%s' % (query_type.lower(), ','.join(query_value))
