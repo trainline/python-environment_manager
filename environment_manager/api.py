@@ -3,6 +3,7 @@
 
 import time
 import requests
+import logging
 from requests.exceptions import *
 from requests.packages.urllib3.exceptions import InsecureRequestWarning
 from environment_manager.utils import LogWrapper, json_encode, to_list
@@ -32,7 +33,9 @@ class EMApi(object):
     def _api_auth(self):
         """ Function to authenticate in Environment Manager """
         log = LogWrapper()
-        log.info('Authenticating in EM with user %s' % self.user)
+        logging.getLogger("requests").setLevel(logging.WARNING)
+        logging.getLogger("urllib3").setLevel(logging.WARNING)
+        log.debug('Authenticating in EM with user %s' % self.user)
         # Build base url
         base_url = 'https://%s' % self.server
         # Request token
@@ -75,6 +78,8 @@ class EMApi(object):
     def query(self, query_endpoint=None, data=None, headers={}, query_type='get', retries=5, backoff=2):
         """ Function to querying Environment Manager """
         log = LogWrapper()
+        logging.getLogger("requests").setLevel(logging.WARNING)
+        logging.getLogger("urllib3").setLevel(logging.WARNING)
         if query_endpoint is None:
             log.info('No endpoint specified, cant just go and query nothing')
             raise SyntaxError('No endpoint specified, cant just go and query nothing')
