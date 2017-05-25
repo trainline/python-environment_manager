@@ -2,7 +2,7 @@
 from setuptools import setup
 
 setup(name='environment_manager',
-      version='0.2.12',
+      version='0.2.13',
       description="A Client library for Environment Manager",
       url="https://github.com/trainline/python-environment_manager",
       author="Trainline Engineering",
