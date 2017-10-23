@@ -909,7 +909,7 @@ class EMApi(object):
         if upstream is None or environment is None:
             raise SyntaxError('Upstream name or Service name has not been specified')
         request_endpoint = '/api/v1/upstreams/%s/slices/toggle?environment=%s' % (upstream, environment)
-        return self.query(query_endpoint=request_endpoint, query_type='GET', **kwargs)
+        return self.query(query_endpoint=request_endpoint, query_type='PUT', **kwargs)
 
     def get_upstreams_config(self, query_type=None, query_value=None, **kwargs):
         """ Get all upstream configurations """
