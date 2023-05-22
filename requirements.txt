@@ -1,4 +1,4 @@
 multiprocessing_logging==0.2.4
-requests==2.13.0
+requests==2.31.0
 setuptools==34.1.0
 simplejson==3.8.2
